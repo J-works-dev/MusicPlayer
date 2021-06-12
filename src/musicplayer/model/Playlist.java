@@ -36,12 +36,4 @@ public class Playlist {
     public int getCount() {
         return playlist.size();
     }
-    
-    public void loadPlaylist() {
-        
-    }
-    
-    public void savePlaylist() {
-        
-    }
 }
