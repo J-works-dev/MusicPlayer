@@ -120,6 +120,7 @@ public class View extends Application {
     }
     
     private void buttonAction() {
+        controller = new ButtonController();
         addBtn.setOnAction(e -> controller.addButtonClicked());
         sortBtn.setOnAction(e -> controller.sortButtonClicked());
         searchBtn.setOnAction(e -> controller.searchButtonClicked());

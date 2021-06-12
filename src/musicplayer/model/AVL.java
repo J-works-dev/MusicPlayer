@@ -131,7 +131,7 @@ public class AVL {
     public Node remove(Node current, Song target) {
         Node parent;
         if (current == null) {
-            System.out.println("There is no " + target + " on the lisf");
+            JOptionPane.showMessageDialog(null, "There is no " + target + " on the lisf");
         }
         else {
             if (target.compareTo(current.data) < 0) {
@@ -181,7 +181,7 @@ public class AVL {
         if (key.equals(find(key, root).data)) {
             System.out.println(key + " was found!!");
         } else {
-            System.out.println("Nothing found!");
+            JOptionPane.showMessageDialog(null, "Nothing found!");
         }
     }
     private Node find (Song key, Node current) {
