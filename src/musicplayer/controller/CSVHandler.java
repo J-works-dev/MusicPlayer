@@ -27,7 +27,7 @@ public class CSVHandler {
                 result.addSong(song);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e);
+            e.printStackTrace();
         }
         
         return result;
@@ -48,7 +48,7 @@ public class CSVHandler {
             writer.close();
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e);
+            e.printStackTrace();
         }
     }
 }
