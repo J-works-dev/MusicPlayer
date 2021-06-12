@@ -41,13 +41,6 @@ public class Playlist {
         return getPlaylist().size();
     }
     
-    public void loadPlaylist() {
-        
-    }
-    
-    public void savePlaylist() {
-        
-    }
     public List<Song> getPlaylist() {
         return playlist;
     }
