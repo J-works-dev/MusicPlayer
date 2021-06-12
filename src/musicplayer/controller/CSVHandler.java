@@ -12,7 +12,7 @@ import musicplayer.model.Song;
 
 public class CSVHandler {
     
-    public void loadPlaylistFromCSV(File fileName) {
+    public static Playlist loadPlaylistFromCSV(File fileName) {
         Playlist result = new Playlist();
         CSVReader reader;
         
@@ -29,6 +29,8 @@ public class CSVHandler {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error: " + e);
         }
+        
+        return result;
     }
 
     public static void writePlaylistToCSV(Playlist playlist) throws IOException {
