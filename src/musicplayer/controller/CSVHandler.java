@@ -7,6 +7,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import java.io.IOException;
 import javax.swing.JOptionPane;
+import musicplayer.model.AVL;
 import musicplayer.model.Playlist;
 import musicplayer.model.Song;
 
@@ -41,9 +42,11 @@ public class CSVHandler {
         try {
             writer = new CSVWriter(new FileWriter(file));
             
-            for (Song song : playlist.getPlaylist()) {
-                String[] path = {song.getPath()};
-                writer.writeNext(path);
+            for (Song song : playlist.display()) {
+                if (song != null) {
+                    String[] path = {song.getPath()};
+                    writer.writeNext(path);
+                }
             }
             writer.close();
 

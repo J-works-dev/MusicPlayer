@@ -13,6 +13,17 @@ public class Song {
         name = song.getName();
     }
         
+    public int compareTo(Song cSong) {
+        return getName().compareTo(cSong.getName());
+    }
+    
+    public boolean equals(Song tSong) {
+        if (this == tSong) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     public File getSong() {
         return song;
     }

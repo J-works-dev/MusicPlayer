@@ -100,7 +100,7 @@ public class View extends Application {
         leftVBox = new VBox();
         leftVBox.setPadding(new Insets(10, 10, 10, 10));
         leftVBox.setSpacing(10);
-        leftVBox.getChildren().addAll(labelAdd, addBtn, labelSort, sortBtn, labelSearch, textSearch, searchBtn, labelDelete, textDelete, deleteBtn);
+        leftVBox.getChildren().addAll(labelAdd, addBtn, labelSearch, textSearch, searchBtn, labelDelete, textDelete, deleteBtn); // labelSort, sortBtn, 
         
         rightVBox = new VBox();
         rightVBox.setPadding(new Insets(10, 10, 10, 10));

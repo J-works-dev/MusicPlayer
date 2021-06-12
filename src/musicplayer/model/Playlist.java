@@ -5,14 +5,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Playlist {
-    private List<Song> playlist;
+    private AVL playlist;
     
     public Playlist() {
-        playlist = new ArrayList<>();
+        playlist = new AVL();
     }
     
     public void loadSongs(File song) throws IOException {
@@ -33,15 +32,19 @@ public class Playlist {
         getPlaylist().add(song);
     }
     
-    public Song getSong(int currentSongIndex) {
-        return getPlaylist().get(currentSongIndex);
-    }
+//    public Song getSong(String key) {
+//        return getPlaylist().search(key);
+//    }
+//    
+//    public int getCount() {
+//        return getPlaylist().size();
+//    }
     
-    public int getCount() {
-        return getPlaylist().size();
-    }
-    
-    public List<Song> getPlaylist() {
+    public AVL getPlaylist() {
         return playlist;
+    }
+    
+    public Song[] display() {
+        return getPlaylist().display();
     }
 }
