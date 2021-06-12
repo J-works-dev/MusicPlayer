@@ -23,17 +23,32 @@ public class Playlist {
         String line = null;
         
         while ((line = br.readLine()) != null) {
-            playlist.add(new Song(line));
+            getPlaylist().add(new Song(line));
         }
         
         br.close();
     }
     
+    public void addSong(Song song) {
+        getPlaylist().add(song);
+    }
+    
     public Song getSong(int currentSongIndex) {
-        return playlist.get(currentSongIndex);
+        return getPlaylist().get(currentSongIndex);
     }
     
     public int getCount() {
-        return playlist.size();
+        return getPlaylist().size();
+    }
+    
+    public void loadPlaylist() {
+        
+    }
+    
+    public void savePlaylist() {
+        
+    }
+    public List<Song> getPlaylist() {
+        return playlist;
     }
 }
