@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -26,6 +27,7 @@ public class View extends Application {
     private TextField textSearch, textDelete;
     private ListView playingList;
     private ButtonController controller;
+    private Label labelAdd, labelSort, labelSearch, labelDelete;
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -44,7 +46,7 @@ public class View extends Application {
         addComponentsToPane();
         
         scene = new Scene(mainVBox, 400, 500);
-        stage.setScene(scene);
+        stage.setScene(getScene());
         stage.show();
     }
     
@@ -56,9 +58,19 @@ public class View extends Application {
         nextBtn = new Button();
         lastBtn = new Button();
         addBtn = new Button("Add Song");
+        addBtn.setPrefSize(150, 20);
         sortBtn = new Button("Sort Playlist");
+        sortBtn.setPrefSize(150, 20);
         searchBtn = new Button("Search Song");
+        searchBtn.setPrefSize(150, 20);
         deleteBtn = new Button("Delete Song");
+        deleteBtn.setPrefSize(150, 20);
+        
+        // Label
+        labelAdd = new Label("Add");
+        labelSort = new Label("Sort");
+        labelSearch = new Label("Search");
+        labelDelete = new Label("Delete");
         
         // Slider
         nowPlayingSlider = new Slider();
@@ -80,10 +92,15 @@ public class View extends Application {
     }
     
     private void addComponentsToPane() {
+        labelAdd.setPadding(new Insets(10, 0, 0, 0));
+        labelSort.setPadding(new Insets(10, 0, 0, 0));
+        labelSearch.setPadding(new Insets(10, 0, 0, 0));
+        labelDelete.setPadding(new Insets(10, 0, 0, 0));
+        
         leftVBox = new VBox();
         leftVBox.setPadding(new Insets(10, 10, 10, 10));
         leftVBox.setSpacing(10);
-        leftVBox.getChildren().addAll(addBtn, sortBtn, textSearch, searchBtn, textDelete, deleteBtn);
+        leftVBox.getChildren().addAll(labelAdd, addBtn, labelSort, sortBtn, labelSearch, textSearch, searchBtn, labelDelete, textDelete, deleteBtn);
         
         rightVBox = new VBox();
         rightVBox.setPadding(new Insets(10, 10, 10, 10));
@@ -116,10 +133,21 @@ public class View extends Application {
     
     private void addIcon(Button button, String iconPath) {
         try {
-            Image icon = new Image(iconPath);
-            button.setGraphic(new ImageView(icon));
+            Image icon = new Image(getClass().getResource(iconPath).toExternalForm());
+            ImageView view = new ImageView(icon);
+            view.setFitHeight(20);
+            view.setPreserveRatio(true);
+            button.setGraphic(view);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, iconPath + " not found.");
         }
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+    
+    public void getStart(String[] args) {
+        launch(args);
     }
 }
