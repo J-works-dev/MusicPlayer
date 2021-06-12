@@ -6,19 +6,14 @@
  */
 package musicplayer;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
+//import javafx.application.Application;
+//import javafx.stage.Stage;
+import musicplayer.view.View;
 
-
-public class MusicPlayer extends Application {
+public class MusicPlayer{
 
     public static void main(String[] args) {
-        launch(args);
+        View GUI = new View();
+        GUI.getStart(args);
     }
-
-    @Override
-    public void start(Stage stage) throws Exception {
-        
-    }
-    
 }
