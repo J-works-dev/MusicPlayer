@@ -1,18 +1,91 @@
 package musicplayer.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import javax.swing.JOptionPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import musicplayer.model.Playlist;
 import musicplayer.model.Song;
 import musicplayer.view.View;
 
 public class Controller {
-    
-    public Controller(String[] args) {
-        View GUI = new View();
-        GUI.getStart(args);
+    private Stage stage;
+    private Playlist playlist;
+    private Song song;
+//    private ButtonController btnController;
+    private View GUI;
+    private String[] args;
+    public Controller() {
         
     }
+    public Controller(String[] args) throws IOException {
+        GUI = new View();
+        this.args = args;
+        this.playlist = GUI.getPlaylist();
+        
+//        btnController = new ButtonController();
+        
+        new Thread() {
+            public void run() {
+                GUI.display(args);
+            }
+        }.start();
+    }
     
+    public Song addButtonClicked() throws IOException {
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(stage);
+        System.out.println(file.getAbsolutePath());
+        if (file != null) {
+            song = new Song(file.getAbsolutePath());
+            return song;
+        }
+        return null;
+    }
     
+    public void sortButtonClicked() {
+        JOptionPane.showMessageDialog(null, "Sort Button Clicked");
+    }
+    
+    public void searchButtonClicked() {
+        JOptionPane.showMessageDialog(null, "Search Button Clicked");
+    }
+    
+    public void deleteButtonClicked() {
+        JOptionPane.showMessageDialog(null, "Delete Button Clicked");
+    }
+    
+    public void firstButtonClicked() {
+        JOptionPane.showMessageDialog(null, "First Button Clicked");
+    }
+    
+    public void backButtonClicked() {
+        JOptionPane.showMessageDialog(null, "Back Button Clicked");
+    }
+    
+    public void playButtonClicked() {
+        JOptionPane.showMessageDialog(null, "Play Button Clicked");
+    }
+    
+    public void nextButtonClicked() {
+        JOptionPane.showMessageDialog(null, "Next Button Clicked");
+    }
+    
+    public void lastButtonClicked() {
+        JOptionPane.showMessageDialog(null, "Last Button Clicked");
+    }
+    
+    public void displayPlaylist(String[] args) {
+        
+        Iterator<String> keys = playlist.gethMap().keySet().iterator();
+        while(keys.hasNext()){
+            String key = keys.next();
+            GUI.addPlaylist(key);
+            GUI.display(args);
+        }
+    }
     
     
     

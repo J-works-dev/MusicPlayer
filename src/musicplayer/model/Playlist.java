@@ -5,13 +5,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.List;
 
 public class Playlist {
     private AVL playlist;
+    private HashMap<String, String> hMap;
     
     public Playlist() {
         playlist = new AVL();
+        hMap = new HashMap<>();
     }
     
     public void loadSongs(File song) throws IOException {
@@ -22,7 +25,7 @@ public class Playlist {
         String line = null;
         
         while ((line = br.readLine()) != null) {
-            getPlaylist().add(new Song(line));
+            addSong(new Song(line));
         }
         
         br.close();
@@ -30,6 +33,7 @@ public class Playlist {
     
     public void addSong(Song song) {
         getPlaylist().add(song);
+        gethMap().put(song.getName(), song.getPath());
     }
     
 //    public Song getSong(String key) {
@@ -46,5 +50,9 @@ public class Playlist {
     
     public Song[] display() {
         return getPlaylist().display();
+    }
+
+    public HashMap<String, String> gethMap() {
+        return hMap;
     }
 }

@@ -1,6 +1,8 @@
 package musicplayer.model;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Song {
     private File song;
@@ -8,9 +10,11 @@ public class Song {
     private String name;
     
     public Song(String songPath) {        
-        song = new File(Song.class.getResource(songPath).getFile());
+//        song = new File(Song.class.getResource(songPath).getFile());
         path = songPath;
-        name = song.getName();
+        Path aaa = Paths.get(path);
+        name = aaa.getFileName().toString();
+        System.out.println("Path: " + this.getPath() + "Name: " + this.getName());
     }
         
     public int compareTo(Song cSong) {
