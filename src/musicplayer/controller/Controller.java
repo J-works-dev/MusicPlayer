@@ -6,9 +6,11 @@ import java.util.Iterator;
 import javax.swing.JOptionPane;
 import javafx.scene.media.Media;  
 import javafx.scene.media.MediaPlayer;  
+import javafx.scene.media.MediaPlayer.Status;
 import javafx.scene.media.MediaView;  
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import musicplayer.model.Playlist;
 import musicplayer.model.Song;
 import musicplayer.view.View;
@@ -18,15 +20,20 @@ public class Controller {
     private Playlist playlist;
     private Song song;
 //    private ButtonController btnController;
-    private View GUI;
+    private static View GUI;
     private String[] args;
-    public Controller() {
-        
-    }
+    private Media media;
+    private static MediaPlayer mediaPlayer;
+    private boolean isPlaying = false;
+    private static int totalTime, startTime, stopTime;
+    
+    public Controller() {}
+    
     public Controller(String[] args) throws IOException {
+//        playlist = new Playlist();
         GUI = new View();
         this.args = args;
-        this.playlist = GUI.getPlaylist();
+        playlist = GUI.getPlaylist();
         
 //        btnController = new ButtonController();
         
@@ -35,10 +42,24 @@ public class Controller {
                 GUI.display(args);
             }
         }.start();
+        String path = "/musicplayer/mp3/ConversationattheCross.mp3";
+        media = new Media(getClass().getResource(path).toExternalForm());
+        mediaPlayer = new MediaPlayer(media);
+        totalTime = (int)mediaPlayer.getMedia().getDuration().toSeconds();
+        System.out.println(totalTime);
+//        GUI.getNowPlayingSlider().setMax(totalTime);
     }
+        
+//    public void setCurrentPlay(String path) {
+////        String path = "ConversationattheCross.mp3";
+//        Media media = new Media(getClass().getResource(path).toExternalForm());
+//        MediaPlayer mediaPlayer = new MediaPlayer(media);
+//        playAudio();
+//    }
     
     public Song addButtonClicked() throws IOException {
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File("C:\\Users\\Jeremy\\Documents\\NetBeansProjects\\MusicPlayer\\src\\musicplayer"));
         File file = fileChooser.showOpenDialog(stage);
         
         if (file != null) {
@@ -68,8 +89,36 @@ public class Controller {
         JOptionPane.showMessageDialog(null, "Back Button Clicked");
     }
     
-    public void playButtonClicked(Playlist playlist) {
-        playAudio("mp3/Day's Psalm.mp3");
+    public void playButtonClicked() {
+//        String path = "/musicplayer/mp3/ConversationattheCross.mp3";
+//        media = new Media(getClass().getResource(path).toExternalForm());
+//        mediaPlayer = new MediaPlayer(media);
+        GUI.getNowPlayingSlider().setMax(totalTime);
+        if (mediaPlayer.getStatus() != Status.PLAYING) {
+            isPlaying = true;
+//            if (mediaPlayer.getStatus().PLAYING) {
+//                
+//            }
+            new Thread() {
+                public void run() {
+                    if (mediaPlayer.getStatus() == Status.PAUSED) {
+                        mediaPlayer.getCurrentTime();
+                    }
+                    
+                    
+                    
+                    mediaPlayer.play();
+                    System.out.println(mediaPlayer.getCurrentTime().toSeconds());
+                    GUI.getNowPlayingSlider().setValue(40);
+                }
+            }.start();
+            GUI.addIcon(GUI.getPlayBtn(), "icons/pause.png");
+        } else {
+            isPlaying = false;
+//            Duration d1 = mediaPlayer.getCurrentTime();
+            mediaPlayer.pause();
+            GUI.addIcon(GUI.getPlayBtn(), "icons/play.png");
+        }
     }
     
     public void nextButtonClicked() {
@@ -98,13 +147,11 @@ public class Controller {
         }
     }
     
-    public void playAudio(String path) {
-//        Audio audio = new Audio(getClass().getResource("mp3/Day's Psalm.mp3").toString());
-//        audio.play();
-        Media media = new Media(new File(path).toURI().toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.play(); 
-    }
+//    public void playAudio() {
+//        if(mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING){
+//            mediaPlayer.play();
+//        }
+//    }
     
     
     

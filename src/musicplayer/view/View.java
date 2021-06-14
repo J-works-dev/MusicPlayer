@@ -18,6 +18,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
@@ -28,16 +29,20 @@ import musicplayer.model.Song;
 
 public class View extends Application {
     private Scene scene;
-    private VBox mainVBox, leftVBox, rightVBox;
+    private VBox mainVBox, leftVBox, rightVBox, playBox;
     private HBox mainHBox, mPlayer;
-    private Button firstBtn, backBtn, playBtn, nextBtn, lastBtn, addBtn, sortBtn, searchBtn, deleteBtn, loadCSVBtn, saveCSVBtn;
-    private Slider nowPlayingSlider;
-    private TextField textSearch, textDelete;
-    private ListView playingList;
+    private static Button firstBtn, backBtn, playBtn, nextBtn, lastBtn, addBtn, sortBtn, searchBtn, deleteBtn, loadCSVBtn, saveCSVBtn;
+    private static Slider nowPlayingSlider;
+    private TextField textSearch, textDelete, textPlaying;
+    private static ListView playingList;
 //    private ButtonController controller;
     private Controller controller;
     private Label labelAdd, labelSort, labelSearch, labelDelete, labelCSV;
     private Playlist playlist;
+    
+//    public View(Playlist list) {
+//        this.playlist = list;
+//    }
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -98,10 +103,14 @@ public class View extends Application {
         
         // Slider
         nowPlayingSlider = new Slider();
+        nowPlayingSlider.setMax(200);
         
         // TextField
         textSearch = new TextField();
         textDelete = new TextField();
+        textPlaying = new TextField();
+        textPlaying.setEditable(false);
+        textPlaying.setFont(Font.font(10));
         
         // ListView
         playingList = new ListView();
@@ -135,10 +144,14 @@ public class View extends Application {
         mainHBox = new HBox();
         mainHBox.getChildren().addAll(leftVBox, rightVBox);
         
+        playBox = new VBox();
+        playBox.setMargin(textPlaying, new Insets(5, 0, 0, 0));
+        playBox.getChildren().addAll(nowPlayingSlider, textPlaying);
+        
         mPlayer = new HBox();
         mPlayer.setPadding(new Insets(10, 10, 10, 10));
         mPlayer.setSpacing(10);
-        mPlayer.getChildren().addAll(getFirstBtn(), getBackBtn(), getPlayBtn(), getNextBtn(), getLastBtn(), nowPlayingSlider);
+        mPlayer.getChildren().addAll(getFirstBtn(), getBackBtn(), getPlayBtn(), getNextBtn(), getLastBtn(), playBox);
         
         mainVBox = new VBox();
         mainVBox.getChildren().addAll(mainHBox, mPlayer);
@@ -161,14 +174,14 @@ public class View extends Application {
         getDeleteBtn().setOnAction(e -> controller.deleteButtonClicked());
         getFirstBtn().setOnAction(e -> controller.firstButtonClicked());
         getBackBtn().setOnAction(e -> controller.backButtonClicked());
-        getPlayBtn().setOnAction(e -> controller.playButtonClicked(playlist));
+        getPlayBtn().setOnAction(e -> controller.playButtonClicked());
         getNextBtn().setOnAction(e -> controller.nextButtonClicked());
         getLastBtn().setOnAction(e -> controller.lastButtonClicked());
         getLoadCSVBtn().setOnAction(e -> controller.loadCSVButtonClicked());
         getSaveCSVBtn().setOnAction(e -> controller.saveCSVButtonClicked());
     }
     
-    private void addIcon(Button button, String iconPath) {
+    public void addIcon(Button button, String iconPath) {
         try {
             Image icon = new Image(getClass().getResource(iconPath).toExternalForm());
             ImageView view = new ImageView(icon);
@@ -176,7 +189,7 @@ public class View extends Application {
             view.setPreserveRatio(true);
             button.setGraphic(view);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, iconPath + " not found.");
+            JOptionPane.showMessageDialog(null, iconPath + " not found." + ex);
         }
     }
 
@@ -238,5 +251,9 @@ public class View extends Application {
 
     public Playlist getPlaylist() {
         return playlist;
+    }
+    
+    public Slider getNowPlayingSlider() {
+        return nowPlayingSlider;
     }
 }
