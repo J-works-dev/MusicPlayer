@@ -170,7 +170,10 @@ public class View extends Application {
             }
         }); // addBtn.setOnAction(e -> controller.addButtonClicked());
         getSortBtn().setOnAction(e -> controller.sortButtonClicked());
-        getSearchBtn().setOnAction(e -> controller.searchButtonClicked());
+        getSearchBtn().setOnAction(e -> {
+            String key = textSearch.getText();
+            controller.searchButtonClicked(key);
+                });
         getDeleteBtn().setOnAction(e -> controller.deleteButtonClicked());
         getFirstBtn().setOnAction(e -> controller.firstButtonClicked());
         getBackBtn().setOnAction(e -> controller.backButtonClicked());

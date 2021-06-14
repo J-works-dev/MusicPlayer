@@ -90,8 +90,21 @@ public class Controller {
         JOptionPane.showMessageDialog(null, "Sort Button Clicked");
     }
     
-    public void searchButtonClicked() {
-        JOptionPane.showMessageDialog(null, "Search Button Clicked");
+    public void searchButtonClicked(String key) {
+        boolean found = false;
+        Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
+        while(keys.hasNext()){
+            String comKey = keys.next();
+            if (key.equals(comKey)) {
+                JOptionPane.showMessageDialog(null, key + " is found.");
+                found = true;
+            }
+        }
+        if (!found) {
+            JOptionPane.showMessageDialog(null, key + " is not found.");
+        }
+        String result = GUI.getPlaylist().gethMap.get(key);
+        handleCurrentSong(result);
     }
     
     public void deleteButtonClicked() {
