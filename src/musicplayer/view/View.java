@@ -138,7 +138,7 @@ public class View extends Application {
         labelDelete.setPadding(new Insets(10, 0, 0, 0));
         
         CSVBox = new HBox();
-        
+        CSVBox.getChildren().addAll(getLoadCSVBtn(), getSaveCSVBtn());
         
         leftVBox = new VBox();
         leftVBox.setPadding(new Insets(10, 10, 10, 10));
