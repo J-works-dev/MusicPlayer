@@ -60,10 +60,9 @@ public class Controller {
 //        MediaPlayer mediaPlayer = new MediaPlayer(media);
 //        playAudio();
 //    }
-    public void handleCurrentSong(String path, String[] args) {
+    public void handleCurrentSong(String path) {
 //        Iterator<String> values = playlist.gethMap().values().iterator();
 //        currentSong = values.next();
-        GUI.display(args);
         System.out.println(path);
         path = path.replaceAll(".*src", "");
         System.out.println(path);
@@ -74,7 +73,7 @@ public class Controller {
     
     public Song addButtonClicked() throws IOException {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File("C:\\Users\\Jeremy\\Documents\\NetBeansProjects\\MusicPlayer\\src\\musicplayer"));
+        fileChooser.setInitialDirectory(new File("C:\\Users\\Jeremy\\Documents\\NetBeansProjects\\MusicPlayer\\src\\musicplayer\\mp3"));
         File file = fileChooser.showOpenDialog(stage);
         
         if (file != null) {
@@ -98,13 +97,13 @@ public class Controller {
             if (key.equals(comKey)) {
                 JOptionPane.showMessageDialog(null, key + " is found.");
                 found = true;
+                String result = GUI.getPlaylist().gethMap().get(key);
+                handleCurrentSong(result);
             }
         }
-        if (!found) {
+        if (found) {
             JOptionPane.showMessageDialog(null, key + " is not found.");
         }
-        String result = GUI.getPlaylist().gethMap.get(key);
-        handleCurrentSong(result);
     }
     
     public void deleteButtonClicked() {
@@ -123,7 +122,7 @@ public class Controller {
         if (GUI.getPlaylist() != null) {
             Iterator<String> values = GUI.getPlaylist().gethMap().values().iterator();
             currentSong = values.next();
-            handleCurrentSong(currentSong, args);
+            handleCurrentSong(currentSong);
             isFirst = false;
         } else {
             JOptionPane.showMessageDialog(null, "There is no Music file!");
@@ -132,7 +131,7 @@ public class Controller {
             if (!hasCurrent) {
                 Iterator<String> values = GUI.getPlaylist().gethMap().values().iterator();
                 currentSong = values.next();
-                handleCurrentSong(currentSong, args);
+                handleCurrentSong(currentSong);
                 hasCurrent = true;
                 isFirst = true;
             }

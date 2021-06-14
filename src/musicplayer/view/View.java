@@ -158,7 +158,6 @@ public class View extends Application {
     }
     
     private void buttonAction() {
-//        controller = new ButtonController();
         controller = new Controller();
         getAddBtn().setOnAction(e -> {
             try {
@@ -168,10 +167,11 @@ public class View extends Application {
             } catch (IOException ex) {
                 Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }); // addBtn.setOnAction(e -> controller.addButtonClicked());
+        });
         getSortBtn().setOnAction(e -> controller.sortButtonClicked());
         getSearchBtn().setOnAction(e -> {
             String key = textSearch.getText();
+            System.out.println(key);
             controller.searchButtonClicked(key);
                 });
         getDeleteBtn().setOnAction(e -> controller.deleteButtonClicked());
