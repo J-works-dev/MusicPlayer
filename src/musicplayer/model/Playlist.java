@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Playlist {
-    private AVL playlist;
-    private HashMap<String, String> hMap;
+    private static AVL playlist;
+    private static HashMap<String, String> hMap;
     
     public Playlist() {
         playlist = new AVL();

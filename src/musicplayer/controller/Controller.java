@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
+import javafx.animation.*;
 import javafx.scene.media.Media;  
 import javafx.scene.media.MediaPlayer;  
 import javafx.scene.media.MediaPlayer.Status;
@@ -14,26 +15,29 @@ import javafx.util.Duration;
 import musicplayer.model.Playlist;
 import musicplayer.model.Song;
 import musicplayer.view.View;
+import java.util.HashMap;
 
 public class Controller {
     private Stage stage;
-    private Playlist playlist;
+    private static Playlist playlist;
     private Song song;
 //    private ButtonController btnController;
     private static View GUI;
     private String[] args;
-    private Media media;
+    private static Media media;
     private static MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
+    private boolean isFirst = true;
+    private boolean hasCurrent = false;
     private static int totalTime, startTime, stopTime;
+    private static String currentSong;
     
     public Controller() {}
     
     public Controller(String[] args) throws IOException {
-//        playlist = new Playlist();
         GUI = new View();
         this.args = args;
-        playlist = GUI.getPlaylist();
+//        playlist = GUI.getPlaylist();
         
 //        btnController = new ButtonController();
         
@@ -42,11 +46,11 @@ public class Controller {
                 GUI.display(args);
             }
         }.start();
-        String path = "/musicplayer/mp3/ConversationattheCross.mp3";
-        media = new Media(getClass().getResource(path).toExternalForm());
-        mediaPlayer = new MediaPlayer(media);
-        totalTime = (int)mediaPlayer.getMedia().getDuration().toSeconds();
-        System.out.println(totalTime);
+//        String path = "/musicplayer/mp3/ConversationattheCross.mp3";
+//        media = new Media(getClass().getResource(path).toExternalForm());
+//        mediaPlayer = new MediaPlayer(media);
+//        totalTime = (int)mediaPlayer.getMedia().getDuration().toSeconds();
+//        System.out.println(totalTime);
 //        GUI.getNowPlayingSlider().setMax(totalTime);
     }
         
@@ -56,6 +60,17 @@ public class Controller {
 //        MediaPlayer mediaPlayer = new MediaPlayer(media);
 //        playAudio();
 //    }
+    public void handleCurrentSong(String path, String[] args) {
+//        Iterator<String> values = playlist.gethMap().values().iterator();
+//        currentSong = values.next();
+        GUI.display(args);
+        System.out.println(path);
+        path = path.replaceAll(".*src", "");
+        System.out.println(path);
+        media = new Media(getClass().getResource(path).toExternalForm());
+        mediaPlayer = new MediaPlayer(media);
+        
+    }
     
     public Song addButtonClicked() throws IOException {
         FileChooser fileChooser = new FileChooser();
@@ -64,6 +79,8 @@ public class Controller {
         
         if (file != null) {
             song = new Song(file.getAbsolutePath());
+//            playlist.addSong(song);
+            isFirst = false;
             return song;
         }
         return null;
@@ -90,34 +107,51 @@ public class Controller {
     }
     
     public void playButtonClicked() {
-//        String path = "/musicplayer/mp3/ConversationattheCross.mp3";
-//        media = new Media(getClass().getResource(path).toExternalForm());
-//        mediaPlayer = new MediaPlayer(media);
-        GUI.getNowPlayingSlider().setMax(totalTime);
-        if (mediaPlayer.getStatus() != Status.PLAYING) {
-            isPlaying = true;
-//            if (mediaPlayer.getStatus().PLAYING) {
-//                
-//            }
-            new Thread() {
-                public void run() {
-                    if (mediaPlayer.getStatus() == Status.PAUSED) {
-                        mediaPlayer.getCurrentTime();
-                    }
-                    
-                    
-                    
-                    mediaPlayer.play();
-                    System.out.println(mediaPlayer.getCurrentTime().toSeconds());
-                    GUI.getNowPlayingSlider().setValue(40);
-                }
-            }.start();
-            GUI.addIcon(GUI.getPlayBtn(), "icons/pause.png");
+        if (GUI.getPlaylist() != null) {
+            Iterator<String> values = GUI.getPlaylist().gethMap().values().iterator();
+            currentSong = values.next();
+            handleCurrentSong(currentSong, args);
+            isFirst = false;
         } else {
-            isPlaying = false;
-//            Duration d1 = mediaPlayer.getCurrentTime();
-            mediaPlayer.pause();
-            GUI.addIcon(GUI.getPlayBtn(), "icons/play.png");
+            JOptionPane.showMessageDialog(null, "There is no Music file!");
+        }
+        if (!isFirst) {
+            if (!hasCurrent) {
+                Iterator<String> values = GUI.getPlaylist().gethMap().values().iterator();
+                currentSong = values.next();
+                handleCurrentSong(currentSong, args);
+                hasCurrent = true;
+                isFirst = true;
+            }
+            totalTime = (int)mediaPlayer.getMedia().getDuration().toSeconds();
+            System.out.println(totalTime);
+            GUI.getNowPlayingSlider().setMax(totalTime);
+            if (mediaPlayer.getStatus() != Status.PLAYING) {
+                isPlaying = true;
+                new Thread() {
+                    public void run() {
+
+                        mediaPlayer.play();
+
+                        while (isPlaying) {
+                            for (int i = startTime; i < totalTime; i++) {
+                                GUI.getNowPlayingSlider().setValue((int)mediaPlayer.getCurrentTime().toSeconds());
+                                try {
+                                    Thread.sleep(1000); 
+                                } catch (InterruptedException e) {
+                                }
+                            }
+                        }
+                    }
+                }.start();
+                GUI.addIcon(GUI.getPlayBtn(), "icons/pause.png");
+            } else {
+                isPlaying = false;
+                mediaPlayer.pause();
+                System.out.println(mediaPlayer.getStatus());
+                startTime = (int)mediaPlayer.getCurrentTime().toSeconds();
+                GUI.addIcon(GUI.getPlayBtn(), "icons/play.png");
+            }
         }
     }
     

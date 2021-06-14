@@ -36,9 +36,9 @@ public class View extends Application {
     private TextField textSearch, textDelete, textPlaying;
     private static ListView playingList;
 //    private ButtonController controller;
-    private Controller controller;
+    private static Controller controller;
     private Label labelAdd, labelSort, labelSearch, labelDelete, labelCSV;
-    private Playlist playlist;
+    private static Playlist playlist;
     
 //    public View(Playlist list) {
 //        this.playlist = list;
