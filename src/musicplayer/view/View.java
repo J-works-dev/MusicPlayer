@@ -21,7 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
-import musicplayer.controller.ButtonController;
+//import musicplayer.controller.ButtonController;
 import musicplayer.controller.Controller;
 import musicplayer.model.Playlist;
 import musicplayer.model.Song;
@@ -29,19 +29,15 @@ import musicplayer.model.Song;
 public class View extends Application {
     private Scene scene;
     private VBox mainVBox, leftVBox, rightVBox;
-    private HBox mainHBox, mPlayer, CSVBox;
+    private HBox mainHBox, mPlayer;
     private Button firstBtn, backBtn, playBtn, nextBtn, lastBtn, addBtn, sortBtn, searchBtn, deleteBtn, loadCSVBtn, saveCSVBtn;
     private Slider nowPlayingSlider;
     private TextField textSearch, textDelete;
     private ListView playingList;
 //    private ButtonController controller;
     private Controller controller;
-    private Label labelAdd, labelSort, labelSearch, labelDelete;
+    private Label labelAdd, labelSort, labelSearch, labelDelete, labelCSV;
     private Playlist playlist;
-    
-//    public View(Playlist playlist) {
-//        this.playlist = playlist;
-//    }
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -49,26 +45,13 @@ public class View extends Application {
         playlist = new Playlist();
         initializeComponents();
         buttonAction();
-//        getAddBtn().setOnAction(e -> {
-//            addPlaylist("Add");
-//            FileChooser fileChooser = new FileChooser();
-//            File file = fileChooser.showOpenDialog(stage);
-//            System.out.println(file.getAbsolutePath());
-//            if (file != null) {
-//                Song song = new Song(file.getAbsolutePath());
-//                addPlaylist("File.mp3");
-//                getPlaylist().addSong(song);
-//            }
-//        });
+
         Iterator<String> keys = getPlaylist().gethMap().keySet().iterator();
-        System.out.println(keys);
         while(keys.hasNext()){
             String key = keys.next();
             getPlayingList().getItems().add(key);
-            
-//            display(args);
         }
-        addPlaylist("Test");
+        
         try {
             FXMLLoader loader = new FXMLLoader(this.getClass().getResource("main.fxml"));
         } catch (Exception ex) {
@@ -102,15 +85,16 @@ public class View extends Application {
         deleteBtn = new Button("Delete Song");
         getDeleteBtn().setPrefSize(150, 20);
         loadCSVBtn = new Button("Load CSV");
-        getLoadCSVBtn().setPrefSize(70, 20);
+        getLoadCSVBtn().setPrefSize(150, 20);
         saveCSVBtn = new Button("Save CSV");
-        getSaveCSVBtn().setPrefSize(70, 20);
+        getSaveCSVBtn().setPrefSize(150, 20);
         
         // Label
         labelAdd = new Label("Add");
         labelSort = new Label("Sort");
         labelSearch = new Label("Search");
         labelDelete = new Label("Delete");
+        labelCSV = new Label("CSV");
         
         // Slider
         nowPlayingSlider = new Slider();
@@ -136,14 +120,12 @@ public class View extends Application {
         labelSort.setPadding(new Insets(10, 0, 0, 0));
         labelSearch.setPadding(new Insets(10, 0, 0, 0));
         labelDelete.setPadding(new Insets(10, 0, 0, 0));
-        
-        CSVBox = new HBox();
-        CSVBox.getChildren().addAll(getLoadCSVBtn(), getSaveCSVBtn());
+        labelCSV.setPadding(new Insets(10, 0, 0, 0));
         
         leftVBox = new VBox();
         leftVBox.setPadding(new Insets(10, 10, 10, 10));
         leftVBox.setSpacing(10);
-        leftVBox.getChildren().addAll(labelAdd, getAddBtn(), labelSearch, textSearch, getSearchBtn(), labelDelete, textDelete, getDeleteBtn(), CSVBox); // labelSort, sortBtn, 
+        leftVBox.getChildren().addAll(labelAdd, getAddBtn(), labelSearch, textSearch, getSearchBtn(), labelDelete, textDelete, getDeleteBtn(), labelCSV, getLoadCSVBtn(), getSaveCSVBtn()); // labelSort, sortBtn, 
         
         rightVBox = new VBox();
         rightVBox.setPadding(new Insets(10, 10, 10, 10));
@@ -179,9 +161,11 @@ public class View extends Application {
         getDeleteBtn().setOnAction(e -> controller.deleteButtonClicked());
         getFirstBtn().setOnAction(e -> controller.firstButtonClicked());
         getBackBtn().setOnAction(e -> controller.backButtonClicked());
-        getPlayBtn().setOnAction(e -> controller.playButtonClicked());
+        getPlayBtn().setOnAction(e -> controller.playButtonClicked(playlist));
         getNextBtn().setOnAction(e -> controller.nextButtonClicked());
         getLastBtn().setOnAction(e -> controller.lastButtonClicked());
+        getLoadCSVBtn().setOnAction(e -> controller.loadCSVButtonClicked());
+        getSaveCSVBtn().setOnAction(e -> controller.saveCSVButtonClicked());
     }
     
     private void addIcon(Button button, String iconPath) {

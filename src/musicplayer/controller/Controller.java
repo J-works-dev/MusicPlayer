@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
+import javafx.scene.media.Media;  
+import javafx.scene.media.MediaPlayer;  
+import javafx.scene.media.MediaView;  
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import musicplayer.model.Playlist;
@@ -37,7 +40,7 @@ public class Controller {
     public Song addButtonClicked() throws IOException {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(stage);
-        System.out.println(file.getAbsolutePath());
+        
         if (file != null) {
             song = new Song(file.getAbsolutePath());
             return song;
@@ -65,8 +68,8 @@ public class Controller {
         JOptionPane.showMessageDialog(null, "Back Button Clicked");
     }
     
-    public void playButtonClicked() {
-        JOptionPane.showMessageDialog(null, "Play Button Clicked");
+    public void playButtonClicked(Playlist playlist) {
+        playAudio("mp3/Day's Psalm.mp3");
     }
     
     public void nextButtonClicked() {
@@ -77,6 +80,14 @@ public class Controller {
         JOptionPane.showMessageDialog(null, "Last Button Clicked");
     }
     
+    public void loadCSVButtonClicked() {
+        JOptionPane.showMessageDialog(null, "CSV loading...");
+    }
+    
+    public void saveCSVButtonClicked() {
+        JOptionPane.showMessageDialog(null, "CSV saving...");
+    }
+    
     public void displayPlaylist(String[] args) {
         
         Iterator<String> keys = playlist.gethMap().keySet().iterator();
@@ -85,6 +96,14 @@ public class Controller {
             GUI.addPlaylist(key);
             GUI.display(args);
         }
+    }
+    
+    public void playAudio(String path) {
+//        Audio audio = new Audio(getClass().getResource("mp3/Day's Psalm.mp3").toString());
+//        audio.play();
+        Media media = new Media(new File(path).toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.play(); 
     }
     
     
