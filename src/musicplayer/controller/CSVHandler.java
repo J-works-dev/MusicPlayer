@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import musicplayer.model.AVL;
 import musicplayer.model.Playlist;
@@ -13,8 +14,8 @@ import musicplayer.model.Song;
 
 public class CSVHandler {
     
-    public static Playlist loadPlaylistFromCSV(File fileName) {
-        Playlist result = new Playlist();
+    public static ArrayList<Song> loadPlaylistFromCSV(File fileName) {
+        ArrayList<Song> result = new ArrayList<>();
         CSVReader reader;
         
         try {
@@ -23,12 +24,13 @@ public class CSVHandler {
             Song song;
 
             while ((nextLine = reader.readNext()) != null) {
+                String path = nextLine[0].replace("/", "\\");
                 song = new Song(nextLine[0]);
                 
-                result.addSong(song);
+                result.add(song);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "CSV saving failed.");
         }
         
         return result;
@@ -44,8 +46,9 @@ public class CSVHandler {
             
             for (Song song : playlist.display()) {
                 if (song != null) {
-                    String[] path = {song.getPath()};
-                    writer.writeNext(path);
+                    String path = song.getPath().replace("\\", "/");
+                    String[] paths = {path};
+                    writer.writeNext(paths);
                 }
             }
             writer.close();

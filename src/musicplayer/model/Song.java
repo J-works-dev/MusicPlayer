@@ -14,7 +14,6 @@ public class Song {
         path = songPath;
         Path aaa = Paths.get(path);
         name = aaa.getFileName().toString();
-        System.out.println("Path: " + this.getPath() + "Name: " + this.getName());
     }
         
     public int compareTo(Song cSong) {

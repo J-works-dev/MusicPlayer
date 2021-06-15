@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
+import javafx.application.Platform;
 import javafx.animation.*;
 import javafx.scene.media.Media;  
 import javafx.scene.media.MediaPlayer;  
@@ -15,7 +16,9 @@ import javafx.util.Duration;
 import musicplayer.model.Playlist;
 import musicplayer.model.Song;
 import musicplayer.view.View;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class Controller {
     private Stage stage;
@@ -27,10 +30,10 @@ public class Controller {
     private static Media media;
     private static MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
-    private boolean isFirst = true;
     private boolean hasCurrent = false;
     private static int totalTime, startTime, stopTime;
     private static String currentSong;
+    private static String songName;
     
     public Controller() {}
     
@@ -61,14 +64,19 @@ public class Controller {
 //        playAudio();
 //    }
     public void handleCurrentSong(String path) {
-//        Iterator<String> values = playlist.gethMap().values().iterator();
-//        currentSong = values.next();
-        System.out.println(path);
+//        System.out.println(path);
+        path = path.replace("\\", "/");
         path = path.replaceAll(".*src", "");
-        System.out.println(path);
+//        System.out.println(path);
         media = new Media(getClass().getResource(path).toExternalForm());
         mediaPlayer = new MediaPlayer(media);
-        
+        hasCurrent = true;
+        for (Entry<String, String> entry : GUI.getPlaylist().gethMap().entrySet()) {
+            if (entry.getValue().equals(path)) {
+                songName = entry.getKey();
+                System.out.println(songName);
+            }
+        }
     }
     
     public Song addButtonClicked() throws IOException {
@@ -78,8 +86,6 @@ public class Controller {
         
         if (file != null) {
             song = new Song(file.getAbsolutePath());
-//            playlist.addSong(song);
-            isFirst = false;
             return song;
         }
         return null;
@@ -106,8 +112,23 @@ public class Controller {
         }
     }
     
-    public void deleteButtonClicked() {
-        JOptionPane.showMessageDialog(null, "Delete Button Clicked");
+    public void deleteButtonClicked(String key) {
+        String path = GUI.getPlaylist().gethMap().get(key);
+        System.out.println(path);
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(path));
+        File file = fileChooser.showOpenDialog(stage);
+        
+        if (file != null) {
+            song = new Song(file.getAbsolutePath());
+            GUI.getPlaylist().getPlaylist().delete(song);
+            GUI.getPlaylist().gethMap().remove(key);
+            JOptionPane.showMessageDialog(null, key + " is Deleted.");
+        } else {
+            JOptionPane.showMessageDialog(null, key + " is not found.");
+        }
+        
+        
     }
     
     public void firstButtonClicked() {
@@ -119,32 +140,31 @@ public class Controller {
     }
     
     public void playButtonClicked() {
-        if (GUI.getPlaylist() != null) {
-            Iterator<String> values = GUI.getPlaylist().gethMap().values().iterator();
-            currentSong = values.next();
-            handleCurrentSong(currentSong);
-            isFirst = false;
-        } else {
+        if (GUI.getPlaylist() == null) {
             JOptionPane.showMessageDialog(null, "There is no Music file!");
-        }
-        if (!isFirst) {
+        } else {
             if (!hasCurrent) {
                 Iterator<String> values = GUI.getPlaylist().gethMap().values().iterator();
                 currentSong = values.next();
                 handleCurrentSong(currentSong);
                 hasCurrent = true;
-                isFirst = true;
             }
-            totalTime = (int)mediaPlayer.getMedia().getDuration().toSeconds();
-            System.out.println(totalTime);
-            GUI.getNowPlayingSlider().setMax(totalTime);
+            
             if (mediaPlayer.getStatus() != Status.PLAYING) {
                 isPlaying = true;
+                mediaPlayer.play();
+                try {
+                    Thread.sleep(1000); 
+                } catch (Exception e) {
+                    
+                }
+                totalTime = (int)mediaPlayer.getMedia().getDuration().toSeconds();
+                
+                System.out.println(totalTime);
+                GUI.getNowPlayingSlider().setMax(totalTime);
+                GUI.getTextPlaying().setText("Now Playing: " + songName);
                 new Thread() {
                     public void run() {
-
-                        mediaPlayer.play();
-
                         while (isPlaying) {
                             for (int i = startTime; i < totalTime; i++) {
                                 GUI.getNowPlayingSlider().setValue((int)mediaPlayer.getCurrentTime().toSeconds());
@@ -165,6 +185,7 @@ public class Controller {
                 GUI.addIcon(GUI.getPlayBtn(), "icons/play.png");
             }
         }
+        
     }
     
     public void nextButtonClicked() {
@@ -176,11 +197,33 @@ public class Controller {
     }
     
     public void loadCSVButtonClicked() {
-        JOptionPane.showMessageDialog(null, "CSV loading...");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File("C:\\Users\\Jeremy\\Documents\\NetBeansProjects\\MusicPlayer"));
+        File file = fileChooser.showOpenDialog(stage);
+        
+        if (file != null) {
+            ArrayList<Song> songs = new ArrayList<>();
+            songs = CSVHandler.loadPlaylistFromCSV(file);
+            
+            for (Song song : songs) {
+                GUI.getPlaylist().addSong(song);
+//                String name = song.getName().replaceAll(".*playermp3", "");
+                GUI.addPlaylist(song.getName());
+            }
+            JOptionPane.showMessageDialog(null, "CSV loaded");
+        } else {
+            JOptionPane.showMessageDialog(null, "Fils is not selected.");
+        }
     }
     
     public void saveCSVButtonClicked() {
-        JOptionPane.showMessageDialog(null, "CSV saving...");
+        try {
+            CSVHandler.writePlaylistToCSV(GUI.getPlaylist());
+            JOptionPane.showMessageDialog(null, "CSV saved");
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Something wrong..");
+        }
+        
     }
     
     public void displayPlaylist(String[] args) {
@@ -193,25 +236,14 @@ public class Controller {
         }
     }
     
-//    public void playAudio() {
-//        if(mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING){
-//            mediaPlayer.play();
-//        }
-//    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    public void loadPlaylist() {
-        
+    public void listViewClicked() {
+        String nextSong = GUI.getPlayingList().getSelectionModel().getSelectedItem();
+        searchButtonClicked(nextSong);
+        playButtonClicked();
     }
     
-    public void savePlaylist() {
-        
+    public void exit() {
+        Platform.exit();
+        System.exit(0);
     }
 }

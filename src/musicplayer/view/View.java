@@ -2,10 +2,12 @@ package musicplayer.view;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -16,6 +18,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -33,8 +36,9 @@ public class View extends Application {
     private HBox mainHBox, mPlayer;
     private static Button firstBtn, backBtn, playBtn, nextBtn, lastBtn, addBtn, sortBtn, searchBtn, deleteBtn, loadCSVBtn, saveCSVBtn;
     private static Slider nowPlayingSlider;
-    private TextField textSearch, textDelete, textPlaying;
-    private static ListView playingList;
+    private TextField textSearch, textDelete;
+    private static TextField textPlaying;
+    private static ListView<String> playingList;
 //    private ButtonController controller;
     private static Controller controller;
     private Label labelAdd, labelSort, labelSearch, labelDelete, labelCSV;
@@ -68,6 +72,8 @@ public class View extends Application {
         scene = new Scene(mainVBox, 400, 500);
         stage.setScene(getScene());
         stage.show();
+        
+        stage.setOnCloseRequest(e -> controller.exit());
     }
     
     public void display(String[] args) {
@@ -113,7 +119,7 @@ public class View extends Application {
         textPlaying.setFont(Font.font(10));
         
         // ListView
-        playingList = new ListView();
+        playingList = new ListView<>();
 
         addIcon(getFirstBtn(), "icons/first.png");
         addIcon(getBackBtn(), "icons/back.png");
@@ -159,6 +165,7 @@ public class View extends Application {
     
     private void buttonAction() {
         controller = new Controller();
+        
         getAddBtn().setOnAction(e -> {
             try {
                 Song song = controller.addButtonClicked();
@@ -168,20 +175,50 @@ public class View extends Application {
                 Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
+        
         getSortBtn().setOnAction(e -> controller.sortButtonClicked());
+        
         getSearchBtn().setOnAction(e -> {
             String key = textSearch.getText();
             System.out.println(key);
             controller.searchButtonClicked(key);
-                });
-        getDeleteBtn().setOnAction(e -> controller.deleteButtonClicked());
+        });
+        
+        getDeleteBtn().setOnAction(e -> {
+            String key = textDelete.getText();
+            System.out.println(key);
+            controller.deleteButtonClicked(key);
+        });
+        
         getFirstBtn().setOnAction(e -> controller.firstButtonClicked());
+        
         getBackBtn().setOnAction(e -> controller.backButtonClicked());
+        
         getPlayBtn().setOnAction(e -> controller.playButtonClicked());
+        
         getNextBtn().setOnAction(e -> controller.nextButtonClicked());
+        
         getLastBtn().setOnAction(e -> controller.lastButtonClicked());
-        getLoadCSVBtn().setOnAction(e -> controller.loadCSVButtonClicked());
+        
+        getLoadCSVBtn().setOnAction(e -> {
+            controller.loadCSVButtonClicked();
+//            ArrayList<Song> songs = new ArrayList<>();
+//            songs = controller.loadCSVButtonClicked();
+//            for (Song song : songs) {
+//                playlist.addSong(song);
+//                String name = song.getName().replaceAll(".*playermp3", "");
+//                addPlaylist(name);
+//            }
+        });
+        
         getSaveCSVBtn().setOnAction(e -> controller.saveCSVButtonClicked());
+        
+        getPlayingList().setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2) {
+                controller.listViewClicked();
+            }
+            
+        });
     }
     
     public void addIcon(Button button, String iconPath) {
@@ -195,7 +232,7 @@ public class View extends Application {
             JOptionPane.showMessageDialog(null, iconPath + " not found." + ex);
         }
     }
-
+    
     public Scene getScene() {
         return scene;
     }
@@ -204,7 +241,7 @@ public class View extends Application {
         getPlayingList().getItems().add(key);
     }
 
-    public ListView getPlayingList() {
+    public ListView<String> getPlayingList() {
         return playingList;
     }
 
@@ -256,7 +293,15 @@ public class View extends Application {
         return playlist;
     }
     
+    public void setPlaylist(Playlist list) {
+        this.playlist = list;
+    }
+    
     public Slider getNowPlayingSlider() {
         return nowPlayingSlider;
+    }
+    
+    public TextField getTextPlaying() {
+        return textPlaying;
     }
 }
