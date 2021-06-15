@@ -177,11 +177,13 @@ public class AVL {
         return current;
     }
     
-    public void search(Song key) {
+    public boolean search(Song key) {
         if (key.equals(find(key, root).data)) {
-            System.out.println(key + " was found!!");
+//            JOptionPane.showMessageDialog(null, key + "was found.");
+            return true;
         } else {
             JOptionPane.showMessageDialog(null, "Nothing found!");
+            return false;
         }
     }
     private Node find (Song key, Node current) {
@@ -201,6 +203,20 @@ public class AVL {
                 return current;
             }
             return find(key, current.right);
+        }
+    }
+    public Song next(Song key) {
+        if (key.equals(find(key, root).data)) {
+            return find(key, root).right.data;
+        } else {
+            return null;
+        }
+    }
+    public Song previous(Song key) {
+        if (key.equals(find(key, root).data)) {
+            return find(key, root).left.data;
+        } else {
+            return null;
         }
     }
 }

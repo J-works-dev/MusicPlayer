@@ -157,7 +157,8 @@ public class View extends Application {
         mPlayer = new HBox();
         mPlayer.setPadding(new Insets(10, 10, 10, 10));
         mPlayer.setSpacing(10);
-        mPlayer.getChildren().addAll(getFirstBtn(), getBackBtn(), getPlayBtn(), getNextBtn(), getLastBtn(), playBox);
+        mPlayer.getChildren().addAll(getBackBtn(), getPlayBtn(), getNextBtn(), playBox);
+//        mPlayer.getChildren().addAll(getFirstBtn(), getBackBtn(), getPlayBtn(), getNextBtn(), getLastBtn(), playBox);
         
         mainVBox = new VBox();
         mainVBox.getChildren().addAll(mainHBox, mPlayer);
@@ -170,7 +171,8 @@ public class View extends Application {
             try {
                 Song song = controller.addButtonClicked();
                 playlist.addSong(song);
-                addPlaylist(song.getName());
+//                addPlaylist(song.getName());
+                displayPlaylist();
             } catch (IOException ex) {
                 Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -200,22 +202,15 @@ public class View extends Application {
         
         getLastBtn().setOnAction(e -> controller.lastButtonClicked());
         
-        getLoadCSVBtn().setOnAction(e -> {
-            controller.loadCSVButtonClicked();
-//            ArrayList<Song> songs = new ArrayList<>();
-//            songs = controller.loadCSVButtonClicked();
-//            for (Song song : songs) {
-//                playlist.addSong(song);
-//                String name = song.getName().replaceAll(".*playermp3", "");
-//                addPlaylist(name);
-//            }
-        });
+        getLoadCSVBtn().setOnAction(e -> controller.loadCSVButtonClicked());
         
         getSaveCSVBtn().setOnAction(e -> controller.saveCSVButtonClicked());
         
         getPlayingList().setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
                 controller.listViewClicked();
+            } else if (e.getClickCount() == 2) {
+                textDelete.setText(getPlayingList().getSelectionModel().getSelectedItem());
             }
             
         });
@@ -239,6 +234,15 @@ public class View extends Application {
     
     public void addPlaylist(String key) {
         getPlayingList().getItems().add(key);
+        
+    }
+    
+    public void displayPlaylist() {
+        getPlayingList().getItems().clear();
+        Song[] songs = playlist.getPlaylist().display();
+        for (Song song : songs) {
+            getPlayingList().getItems().add(song.getName());
+        }
     }
 
     public ListView<String> getPlayingList() {

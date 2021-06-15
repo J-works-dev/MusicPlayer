@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Playlist {
     private static AVL playlist;
-    private static HashMap<String, String> hMap;
+    private static HashMap<String, Song> hMap;
     
     public Playlist() {
         playlist = new AVL();
@@ -33,7 +33,7 @@ public class Playlist {
     
     public void addSong(Song song) {
         getPlaylist().add(song);
-        gethMap().put(song.getName(), song.getPath());
+        gethMap().put(song.getName(), song);
     }
     
 //    public Song getSong(String key) {
@@ -52,7 +52,7 @@ public class Playlist {
         return getPlaylist().display();
     }
 
-    public HashMap<String, String> gethMap() {
+    public HashMap<String, Song> gethMap() {
         return hMap;
     }
 }

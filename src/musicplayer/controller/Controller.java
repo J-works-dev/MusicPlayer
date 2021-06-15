@@ -32,7 +32,7 @@ public class Controller {
     private boolean isPlaying = false;
     private boolean hasCurrent = false;
     private static int totalTime, startTime, stopTime;
-    private static String currentSong;
+    private static Song currentSong;
     private static String songName;
     
     public Controller() {}
@@ -63,20 +63,16 @@ public class Controller {
 //        MediaPlayer mediaPlayer = new MediaPlayer(media);
 //        playAudio();
 //    }
-    public void handleCurrentSong(String path) {
+    public void handleCurrentSong(Song song) {
 //        System.out.println(path);
+        String path = song.getPath();
         path = path.replace("\\", "/");
         path = path.replaceAll(".*src", "");
 //        System.out.println(path);
         media = new Media(getClass().getResource(path).toExternalForm());
         mediaPlayer = new MediaPlayer(media);
         hasCurrent = true;
-        for (Entry<String, String> entry : GUI.getPlaylist().gethMap().entrySet()) {
-            if (entry.getValue().equals(path)) {
-                songName = entry.getKey();
-                System.out.println(songName);
-            }
-        }
+        songName = song.getName();
     }
     
     public Song addButtonClicked() throws IOException {
@@ -96,39 +92,24 @@ public class Controller {
     }
     
     public void searchButtonClicked(String key) {
-        boolean found = false;
         Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
-        while(keys.hasNext()){
-            String comKey = keys.next();
-            if (key.equals(comKey)) {
-                JOptionPane.showMessageDialog(null, key + " is found.");
-                found = true;
-                String result = GUI.getPlaylist().gethMap().get(key);
-                handleCurrentSong(result);
-            }
-        }
-        if (found) {
-            JOptionPane.showMessageDialog(null, key + " is not found.");
+        Song song = GUI.getPlaylist().gethMap().get(key);
+        
+        if (GUI.getPlaylist().getPlaylist().search(song)) {
+            handleCurrentSong(song);
         }
     }
     
     public void deleteButtonClicked(String key) {
-        String path = GUI.getPlaylist().gethMap().get(key);
-        System.out.println(path);
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File(path));
-        File file = fileChooser.showOpenDialog(stage);
+        Song song = GUI.getPlaylist().gethMap().get(key);
         
-        if (file != null) {
-            song = new Song(file.getAbsolutePath());
+        if (song != null) {
             GUI.getPlaylist().getPlaylist().delete(song);
             GUI.getPlaylist().gethMap().remove(key);
             JOptionPane.showMessageDialog(null, key + " is Deleted.");
         } else {
             JOptionPane.showMessageDialog(null, key + " is not found.");
         }
-        
-        
     }
     
     public void firstButtonClicked() {
@@ -136,7 +117,10 @@ public class Controller {
     }
     
     public void backButtonClicked() {
-        JOptionPane.showMessageDialog(null, "Back Button Clicked");
+        mediaPlayer.stop();
+        currentSong = GUI.getPlaylist().getPlaylist().previous(currentSong);
+        handleCurrentSong(currentSong);
+        playButtonClicked();
     }
     
     public void playButtonClicked() {
@@ -144,7 +128,7 @@ public class Controller {
             JOptionPane.showMessageDialog(null, "There is no Music file!");
         } else {
             if (!hasCurrent) {
-                Iterator<String> values = GUI.getPlaylist().gethMap().values().iterator();
+                Iterator<Song> values = GUI.getPlaylist().gethMap().values().iterator();
                 currentSong = values.next();
                 handleCurrentSong(currentSong);
                 hasCurrent = true;
@@ -160,7 +144,7 @@ public class Controller {
                 }
                 totalTime = (int)mediaPlayer.getMedia().getDuration().toSeconds();
                 
-                System.out.println(totalTime);
+//                System.out.println(totalTime);
                 GUI.getNowPlayingSlider().setMax(totalTime);
                 GUI.getTextPlaying().setText("Now Playing: " + songName);
                 new Thread() {
@@ -180,7 +164,7 @@ public class Controller {
             } else {
                 isPlaying = false;
                 mediaPlayer.pause();
-                System.out.println(mediaPlayer.getStatus());
+//                System.out.println(mediaPlayer.getStatus());
                 startTime = (int)mediaPlayer.getCurrentTime().toSeconds();
                 GUI.addIcon(GUI.getPlayBtn(), "icons/play.png");
             }
@@ -189,7 +173,10 @@ public class Controller {
     }
     
     public void nextButtonClicked() {
-        JOptionPane.showMessageDialog(null, "Next Button Clicked");
+        mediaPlayer.stop();
+        currentSong = GUI.getPlaylist().getPlaylist().next(currentSong);
+        handleCurrentSong(currentSong);
+        playButtonClicked();
     }
     
     public void lastButtonClicked() {
@@ -225,18 +212,19 @@ public class Controller {
         }
         
     }
-    
-    public void displayPlaylist(String[] args) {
-        
-        Iterator<String> keys = playlist.gethMap().keySet().iterator();
-        while(keys.hasNext()){
-            String key = keys.next();
-            GUI.addPlaylist(key);
-            GUI.display(args);
-        }
-    }
-    
+//    
+//    public void displayPlaylist(String[] args) {
+//        
+//        Iterator<String> keys = playlist.gethMap().keySet().iterator();
+//        while(keys.hasNext()){
+//            String key = keys.next();
+//            GUI.addPlaylist(key);
+//            GUI.display(args);
+//        }
+//    }
+//    
     public void listViewClicked() {
+        mediaPlayer.stop();
         String nextSong = GUI.getPlayingList().getSelectionModel().getSelectedItem();
         searchButtonClicked(nextSong);
         playButtonClicked();
