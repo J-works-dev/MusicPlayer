@@ -80,18 +80,15 @@ public class Controller {
         mediaPlayer.setOnReady(() -> {
             totalTime = (int)mediaPlayer.getStopTime().toSeconds();
             GUI.getNowPlayingSlider().setMax(totalTime);
-            GUI.getNowPlayingSlider().setValue((int)mediaPlayer.getCurrentTime().toSeconds());
-            tTime = timeToString(totalTime);
             
+            tTime = timeToString(totalTime);
             GUI.getTotalTime().setText(tTime);
             
             mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
                 public void invalidated(Observable ov) {
-                    if (GUI.getNowPlayingSlider().isValueChanging()) {
-                        cTime = timeToString((int)mediaPlayer.getCurrentTime().toSeconds());
-                        System.out.println(cTime);
-                        GUI.getCurrentTime().setText(cTime);
-                    }
+                    cTime = timeToString((int)mediaPlayer.getCurrentTime().toSeconds());
+                    GUI.getCurrentTime().setText(cTime);
+                    GUI.getNowPlayingSlider().setValue((int)mediaPlayer.getCurrentTime().toSeconds());
                 }
             });
             
@@ -100,7 +97,6 @@ public class Controller {
                 {
                     if (GUI.getNowPlayingSlider().isPressed()) {
                         mediaPlayer.seek(mediaPlayer.getMedia().getDuration().multiply(GUI.getNowPlayingSlider().getValue() / 100));
-//                        System.out.println(mediaPlayer.getStatus());
                     }
                 }
             });
@@ -371,7 +367,6 @@ public class Controller {
 //    
     public void listViewDoubleClicked() {
         String nextSong = GUI.getPlayingList().getSelectionModel().getSelectedItem();
-        System.out.println(nextSong);
         Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
         Song song = GUI.getPlaylist().gethMap().get(nextSong);
 
