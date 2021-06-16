@@ -6,6 +6,10 @@ import java.util.Iterator;
 import javax.swing.JOptionPane;
 import javafx.application.Platform;
 import javafx.animation.*;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.media.Media;  
 import javafx.scene.media.MediaPlayer;  
 import javafx.scene.media.MediaPlayer.Status;
@@ -13,12 +17,13 @@ import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import java.util.ArrayList;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import musicplayer.model.Playlist;
 import musicplayer.model.Song;
 import musicplayer.view.View;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
 
 public class Controller {
     private Stage stage;
@@ -33,7 +38,8 @@ public class Controller {
     private boolean hasCurrent = false;
     private static int totalTime, startTime, stopTime;
     private static Song currentSong;
-    private static String songName;
+    private static Song nowPlaying;
+    private static String songName, cTime, tTime;
     
     public Controller() {}
     
@@ -64,13 +70,40 @@ public class Controller {
 //        playAudio();
 //    }
     public void handleCurrentSong(Song song) {
-//        System.out.println(path);
+        currentSong = song;
         String path = song.getPath();
         path = path.replace("\\", "/");
         path = path.replaceAll(".*src", "");
-//        System.out.println(path);
         media = new Media(getClass().getResource(path).toExternalForm());
         mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setOnReady(() -> {
+            totalTime = (int)mediaPlayer.getStopTime().toSeconds();
+            GUI.getNowPlayingSlider().setMax(totalTime);
+            GUI.getNowPlayingSlider().setValue((int)mediaPlayer.getCurrentTime().toSeconds());
+            tTime = timeToString(totalTime);
+            
+            GUI.getTotalTime().setText(tTime);
+            
+            mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
+                public void invalidated(Observable ov) {
+                    if (GUI.getNowPlayingSlider().isValueChanging()) {
+                        cTime = timeToString((int)mediaPlayer.getCurrentTime().toSeconds());
+                        GUI.getCurrentTime().setText(cTime);
+                    }
+                }
+            });
+            
+            GUI.getNowPlayingSlider().valueProperty().addListener(new InvalidationListener() {
+                public void invalidated(Observable ov)
+                {
+                    if (GUI.getNowPlayingSlider().isPressed()) {
+                        mediaPlayer.seek(mediaPlayer.getMedia().getDuration().multiply(GUI.getNowPlayingSlider().getValue() / 100));
+                        System.out.println(mediaPlayer.getStatus());
+                    }
+                }
+            });
+            
+        });
         hasCurrent = true;
         songName = song.getName();
     }
@@ -92,30 +125,14 @@ public class Controller {
     }
     
     public void searchButtonClicked(String key) {
-        
-//        if (GUI.getPlaylist().gethMap().size() != 0) {
-//            Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
-//            for (HashMap hash : keys) {
-//                if (name.contains(key)) {
-//                    getPlayingList().getItems().clear();
-//                    GUI.getPlayingList().getItems().add(name);
-//                }
-//            }
-//        }
         Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
-        if (keys.hasNext()) {
-            GUI.getPlayingList().getItems().clear();
-        }
+        GUI.getPlayingList().getItems().clear();
         while(keys.hasNext()){
             String name = keys.next();
             if (name.contains(key)) {
-                    GUI.getPlayingList().getItems().add(name);
-                }
+                GUI.getPlayingList().getItems().add(name);
+            }
         }
-//        Song song = GUI.getPlaylist().gethMap().get(key);
-//        if (GUI.getPlaylist().getPlaylist().search(song)) {
-//            handleCurrentSong(song);
-//        }
     }
     
     public void deleteButtonClicked(String key) {
@@ -125,9 +142,11 @@ public class Controller {
             GUI.getPlaylist().getPlaylist().delete(song);
             GUI.getPlaylist().gethMap().remove(key);
             JOptionPane.showMessageDialog(null, key + " is Deleted.");
+            GUI.displayPlaylist();
         } else {
             JOptionPane.showMessageDialog(null, key + " is not found.");
         }
+        
     }
     
     public void firstButtonClicked() {
@@ -138,8 +157,8 @@ public class Controller {
         if (GUI.getPlaylist().gethMap().size() != 0) {
             if (GUI.getPlaylist().getPlaylist().previous(currentSong) != null) {
                 mediaPlayer.stop();
-                currentSong = GUI.getPlaylist().getPlaylist().previous(currentSong);
-                handleCurrentSong(currentSong);
+//                currentSong = GUI.getPlaylist().getPlaylist().previous(currentSong);
+                handleCurrentSong(GUI.getPlaylist().getPlaylist().previous(currentSong));
                 playButtonClicked();
             } else {
                 JOptionPane.showMessageDialog(null, "This is the First Song");
@@ -150,43 +169,25 @@ public class Controller {
     }
     
     public void playButtonClicked() {
-        System.out.println(GUI.getPlaylist().gethMap());
         if (GUI.getPlaylist().gethMap().size() == 0) {
             JOptionPane.showMessageDialog(null, "There is no Music file!");
         } else {
             if (!hasCurrent) {
                 Iterator<Song> values = GUI.getPlaylist().gethMap().values().iterator();
-                currentSong = values.next();
-                handleCurrentSong(currentSong);
+                handleCurrentSong(values.next());
                 hasCurrent = true;
             }
-            
+            System.out.println(mediaPlayer.getStatus());
             if (mediaPlayer.getStatus() != Status.PLAYING) {
-                isPlaying = true;
-                mediaPlayer.play();
-                try {
-                    Thread.sleep(1000); 
-                } catch (Exception e) {
-                    
+                if (mediaPlayer.getStatus() == Status.PAUSED) {
+//                    mediaPlayer.seek(startTime);
                 }
-                totalTime = (int)mediaPlayer.getMedia().getDuration().toSeconds();
                 
-//                System.out.println(totalTime);
-                GUI.getNowPlayingSlider().setMax(totalTime);
+                mediaPlayer.play();
+                
+                isPlaying = true;
+                nowPlaying = currentSong;
                 GUI.getTextPlaying().setText("Now Playing: " + songName);
-                new Thread() {
-                    public void run() {
-                        while (isPlaying) {
-                            for (int i = startTime; i < totalTime; i++) {
-                                GUI.getNowPlayingSlider().setValue((int)mediaPlayer.getCurrentTime().toSeconds());
-                                try {
-                                    Thread.sleep(1000); 
-                                } catch (InterruptedException e) {
-                                }
-                            }
-                        }
-                    }
-                }.start();
                 GUI.addIcon(GUI.getPlayBtn(), "icons/pause.png");
             } else {
                 isPlaying = false;
@@ -196,7 +197,43 @@ public class Controller {
                 GUI.addIcon(GUI.getPlayBtn(), "icons/play.png");
             }
         }
-        
+        // old version
+//        if (!hasCurrent) {
+//                Iterator<Song> values = GUI.getPlaylist().gethMap().values().iterator();
+//                handleCurrentSong(values.next());
+//                hasCurrent = true;
+//            }
+//            Status status = mediaPlayer.getStatus();
+//            System.out.println(status);
+//            if (status == Status.PLAYING || status == Status.READY) {
+//                if (mediaPlayer.getCurrentTime().greaterThanOrEqualTo(mediaPlayer.getTotalDuration())) {
+//                    mediaPlayer.seek(mediaPlayer.getStartTime());
+//                    mediaPlayer.play();
+//                    GUI.getTextPlaying().setText("Now Playing: " + songName);
+//                    GUI.addIcon(GUI.getPlayBtn(), "icons/pause.png");
+//                    nowPlaying = currentSong;
+//                    isPlaying = true;
+//                }
+//                else {
+//                    mediaPlayer.pause();
+//                    startTime = (int)mediaPlayer.getCurrentTime().toSeconds();
+//                    GUI.addIcon(GUI.getPlayBtn(), "icons/play.png");
+//                    isPlaying = false;
+//                }
+//            } 
+//            if (status ==Status.HALTED || status == Status.STOPPED || status == Status.PAUSED) {
+//                mediaPlayer.play();
+//                GUI.getTextPlaying().setText("Now Playing: " + songName);
+//                GUI.addIcon(GUI.getPlayBtn(), "icons/pause.png");
+//                nowPlaying = currentSong;
+//                isPlaying = true;
+//            }
+    }
+    
+    private String timeToString(int time) {
+        int min = time / 60;
+        int sec = time % 60;
+        return String.format("%02d:%02d", min, sec);
     }
     
     public void nextButtonClicked() {
@@ -229,7 +266,6 @@ public class Controller {
             
             for (Song song : songs) {
                 GUI.getPlaylist().addSong(song);
-//                String name = song.getName().replaceAll(".*playermp3", "");
                 GUI.addPlaylist(song.getName());
             }
             JOptionPane.showMessageDialog(null, "CSV loaded");
@@ -259,18 +295,20 @@ public class Controller {
 //    }
 //    
     public void listViewDoubleClicked() {
-        mediaPlayer.stop();
         String nextSong = GUI.getPlayingList().getSelectionModel().getSelectedItem();
-        
+        System.out.println(nextSong);
         Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
         Song song = GUI.getPlaylist().gethMap().get(nextSong);
-        
+
         if (GUI.getPlaylist().getPlaylist().search(song)) {
+            if (isPlaying) {
+                mediaPlayer.stop();
+                isPlaying = false;
+            }
             handleCurrentSong(song);
+            playButtonClicked();
         }
-//        searchButtonClicked(nextSong);
-        
-        playButtonClicked();
+        GUI.displayPlaylist();
     }
     
     public void exit() {

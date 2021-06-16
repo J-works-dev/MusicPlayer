@@ -33,7 +33,7 @@ import musicplayer.model.Song;
 public class View extends Application {
     private Scene scene;
     private VBox mainVBox, leftVBox, rightVBox, playBox;
-    private HBox mainHBox, mPlayer;
+    private HBox mainHBox, mPlayer, seekBar;
     private static Button firstBtn, backBtn, playBtn, nextBtn, lastBtn, addBtn, sortBtn, searchBtn, deleteBtn, loadCSVBtn, saveCSVBtn;
     private static Slider nowPlayingSlider;
     private TextField textSearch, textDelete;
@@ -42,6 +42,7 @@ public class View extends Application {
 //    private ButtonController controller;
     private static Controller controller;
     private Label labelAdd, labelSort, labelSearch, labelDelete, labelCSV;
+    private static Label totalTime, currentTime;
     private static Playlist playlist;
     
 //    public View(Playlist list) {
@@ -55,11 +56,11 @@ public class View extends Application {
         initializeComponents();
         buttonAction();
 
-        Iterator<String> keys = getPlaylist().gethMap().keySet().iterator();
-        while(keys.hasNext()){
-            String key = keys.next();
-            getPlayingList().getItems().add(key);
-        }
+//        Iterator<String> keys = getPlaylist().gethMap().keySet().iterator();
+//        while(keys.hasNext()){
+//            String key = keys.next();
+//            getPlayingList().getItems().add(key);
+//        }
         
         try {
             FXMLLoader loader = new FXMLLoader(this.getClass().getResource("main.fxml"));
@@ -106,6 +107,8 @@ public class View extends Application {
         labelSearch = new Label("Search");
         labelDelete = new Label("Delete");
         labelCSV = new Label("CSV");
+        currentTime = new Label("00:00");
+        totalTime = new Label("00:00");
         
         // Slider
         nowPlayingSlider = new Slider();
@@ -150,12 +153,17 @@ public class View extends Application {
         mainHBox = new HBox();
         mainHBox.getChildren().addAll(leftVBox, rightVBox);
         
+        seekBar = new HBox();
+        seekBar.setMargin(nowPlayingSlider, new Insets(0, 3, 0, 3));
+        seekBar.getChildren().addAll(currentTime, nowPlayingSlider, totalTime);
+        
         playBox = new VBox();
         playBox.setMargin(textPlaying, new Insets(5, 0, 0, 0));
-        playBox.getChildren().addAll(nowPlayingSlider, textPlaying);
+        playBox.getChildren().addAll(seekBar, textPlaying);
         
         mPlayer = new HBox();
         mPlayer.setPadding(new Insets(10, 10, 10, 10));
+        mPlayer.setMargin(playBox, new Insets(0, 0, 0, 15));
         mPlayer.setSpacing(10);
         mPlayer.getChildren().addAll(getBackBtn(), getPlayBtn(), getNextBtn(), playBox);
 //        mPlayer.getChildren().addAll(getFirstBtn(), getBackBtn(), getPlayBtn(), getNextBtn(), getLastBtn(), playBox);
@@ -184,8 +192,9 @@ public class View extends Application {
         
         getSearchBtn().setOnAction(e -> {
             String key = textSearch.getText();
-            System.out.println(key);
-            controller.searchButtonClicked(key);
+            if (key != null) {
+                controller.searchButtonClicked(key);
+            }
         });
         
         getDeleteBtn().setOnAction(e -> {
@@ -240,10 +249,12 @@ public class View extends Application {
     }
     
     public void displayPlaylist() {
-        getPlayingList().getItems().clear();
         Song[] songs = playlist.getPlaylist().display();
-        for (Song song : songs) {
-            getPlayingList().getItems().add(song.getName());
+        if (songs != null) {
+            getPlayingList().getItems().clear();
+            for (Song song : songs) {
+                getPlayingList().getItems().add(song.getName());
+            }
         }
     }
 
@@ -309,5 +320,17 @@ public class View extends Application {
     
     public TextField getTextPlaying() {
         return textPlaying;
+    }
+    
+    public Label getCurrentTime() {
+        return currentTime;
+    }
+    
+    public void setCurrentTime(String time) {
+//        this.currnetTime.setText(time);
+    }
+    
+    public Label getTotalTime() {
+        return totalTime;
     }
 }
