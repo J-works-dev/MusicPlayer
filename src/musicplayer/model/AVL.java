@@ -207,14 +207,22 @@ public class AVL {
     }
     public Song next(Song key) {
         if (key.equals(find(key, root).data)) {
-            return find(key, root).right.data;
+            if (find(key, root).right != null) {
+                return find(key, root).right.data;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
     }
     public Song previous(Song key) {
         if (key.equals(find(key, root).data)) {
-            return find(key, root).left.data;
+            if (find(key, root).left != null) {
+                return find(key, root).left.data;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }

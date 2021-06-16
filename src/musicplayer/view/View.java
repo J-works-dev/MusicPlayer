@@ -170,9 +170,11 @@ public class View extends Application {
         getAddBtn().setOnAction(e -> {
             try {
                 Song song = controller.addButtonClicked();
-                playlist.addSong(song);
-//                addPlaylist(song.getName());
-                displayPlaylist();
+                if (song != null) {
+                    playlist.addSong(song);
+                    displayPlaylist();
+                }
+                
             } catch (IOException ex) {
                 Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -208,8 +210,8 @@ public class View extends Application {
         
         getPlayingList().setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
-                controller.listViewClicked();
-            } else if (e.getClickCount() == 2) {
+                controller.listViewDoubleClicked();
+            } else if (e.getClickCount() == 1) {
                 textDelete.setText(getPlayingList().getSelectionModel().getSelectedItem());
             }
             

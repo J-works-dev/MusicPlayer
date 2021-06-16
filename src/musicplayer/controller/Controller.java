@@ -92,12 +92,30 @@ public class Controller {
     }
     
     public void searchButtonClicked(String key) {
-        Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
-        Song song = GUI.getPlaylist().gethMap().get(key);
         
-        if (GUI.getPlaylist().getPlaylist().search(song)) {
-            handleCurrentSong(song);
+//        if (GUI.getPlaylist().gethMap().size() != 0) {
+//            Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
+//            for (HashMap hash : keys) {
+//                if (name.contains(key)) {
+//                    getPlayingList().getItems().clear();
+//                    GUI.getPlayingList().getItems().add(name);
+//                }
+//            }
+//        }
+        Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
+        if (keys.hasNext()) {
+            GUI.getPlayingList().getItems().clear();
         }
+        while(keys.hasNext()){
+            String name = keys.next();
+            if (name.contains(key)) {
+                    GUI.getPlayingList().getItems().add(name);
+                }
+        }
+//        Song song = GUI.getPlaylist().gethMap().get(key);
+//        if (GUI.getPlaylist().getPlaylist().search(song)) {
+//            handleCurrentSong(song);
+//        }
     }
     
     public void deleteButtonClicked(String key) {
@@ -117,14 +135,23 @@ public class Controller {
     }
     
     public void backButtonClicked() {
-        mediaPlayer.stop();
-        currentSong = GUI.getPlaylist().getPlaylist().previous(currentSong);
-        handleCurrentSong(currentSong);
-        playButtonClicked();
+        if (GUI.getPlaylist().gethMap().size() != 0) {
+            if (GUI.getPlaylist().getPlaylist().previous(currentSong) != null) {
+                mediaPlayer.stop();
+                currentSong = GUI.getPlaylist().getPlaylist().previous(currentSong);
+                handleCurrentSong(currentSong);
+                playButtonClicked();
+            } else {
+                JOptionPane.showMessageDialog(null, "This is the First Song");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "There is no Music file!");
+        }
     }
     
     public void playButtonClicked() {
-        if (GUI.getPlaylist() == null) {
+        System.out.println(GUI.getPlaylist().gethMap());
+        if (GUI.getPlaylist().gethMap().size() == 0) {
             JOptionPane.showMessageDialog(null, "There is no Music file!");
         } else {
             if (!hasCurrent) {
@@ -173,10 +200,18 @@ public class Controller {
     }
     
     public void nextButtonClicked() {
-        mediaPlayer.stop();
-        currentSong = GUI.getPlaylist().getPlaylist().next(currentSong);
-        handleCurrentSong(currentSong);
-        playButtonClicked();
+        if (GUI.getPlaylist().gethMap().size() != 0) {
+            if (GUI.getPlaylist().getPlaylist().next(currentSong) != null) {
+                mediaPlayer.stop();
+                currentSong = GUI.getPlaylist().getPlaylist().next(currentSong);
+                handleCurrentSong(currentSong);
+                playButtonClicked();
+            } else {
+                JOptionPane.showMessageDialog(null, "This is the Last Song");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "There is no Music file!");
+        }
     }
     
     public void lastButtonClicked() {
@@ -223,10 +258,18 @@ public class Controller {
 //        }
 //    }
 //    
-    public void listViewClicked() {
+    public void listViewDoubleClicked() {
         mediaPlayer.stop();
         String nextSong = GUI.getPlayingList().getSelectionModel().getSelectedItem();
-        searchButtonClicked(nextSong);
+        
+        Iterator<String> keys = GUI.getPlaylist().gethMap().keySet().iterator();
+        Song song = GUI.getPlaylist().gethMap().get(nextSong);
+        
+        if (GUI.getPlaylist().getPlaylist().search(song)) {
+            handleCurrentSong(song);
+        }
+//        searchButtonClicked(nextSong);
+        
         playButtonClicked();
     }
     
