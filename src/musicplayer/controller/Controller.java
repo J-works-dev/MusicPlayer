@@ -3,6 +3,7 @@ package musicplayer.controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.ListIterator;
 import javax.swing.JOptionPane;
 import javafx.application.Platform;
 import javafx.animation.*;
@@ -88,6 +89,7 @@ public class Controller {
                 public void invalidated(Observable ov) {
                     if (GUI.getNowPlayingSlider().isValueChanging()) {
                         cTime = timeToString((int)mediaPlayer.getCurrentTime().toSeconds());
+                        System.out.println(cTime);
                         GUI.getCurrentTime().setText(cTime);
                     }
                 }
@@ -98,7 +100,7 @@ public class Controller {
                 {
                     if (GUI.getNowPlayingSlider().isPressed()) {
                         mediaPlayer.seek(mediaPlayer.getMedia().getDuration().multiply(GUI.getNowPlayingSlider().getValue() / 100));
-                        System.out.println(mediaPlayer.getStatus());
+//                        System.out.println(mediaPlayer.getStatus());
                     }
                 }
             });
@@ -154,17 +156,51 @@ public class Controller {
     }
     
     public void backButtonClicked() {
-        if (GUI.getPlaylist().gethMap().size() != 0) {
-            if (GUI.getPlaylist().getPlaylist().previous(currentSong) != null) {
-                mediaPlayer.stop();
-//                currentSong = GUI.getPlaylist().getPlaylist().previous(currentSong);
-                handleCurrentSong(GUI.getPlaylist().getPlaylist().previous(currentSong));
-                playButtonClicked();
-            } else {
+        boolean isfound = false;
+        Song cursor;
+        Song previous;
+        
+        if (currentSong != null) {
+            Iterator<Song> iterator = GUI.getPlaylist().gethMap().values().iterator();
+            previous = iterator.next();
+            if (currentSong == previous) {
                 JOptionPane.showMessageDialog(null, "This is the First Song");
+            } else {
+                while (iterator.hasNext()) {
+                    cursor = iterator.next();
+                    if (currentSong == cursor) {
+                        isfound = true;
+                        break;
+                    } else {
+                        previous = cursor;
+                    }
+                }
+                if (isfound) {
+                    if (isPlaying) {
+                        mediaPlayer.stop();
+                        isPlaying = false;
+                    }
+                    handleCurrentSong(previous);
+                    playButtonClicked();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Something Wrong...");
+                }
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "There is no Music file!");
+            
+            
+            
+//            System.out.println("currentSong is not null");
+//            if (GUI.getPlaylist().getPlaylist().previous(currentSong) != null) {
+//                System.out.println("song is not null");
+//                if (isPlaying) {
+//                    mediaPlayer.stop();
+//                    isPlaying = false;
+//                }
+//                handleCurrentSong(GUI.getPlaylist().getPlaylist().previous(currentSong));
+//                playButtonClicked();
+//            } else {
+//                JOptionPane.showMessageDialog(null, "This is the First Song");
+//            }
         }
     }
     
@@ -177,11 +213,7 @@ public class Controller {
                 handleCurrentSong(values.next());
                 hasCurrent = true;
             }
-            System.out.println(mediaPlayer.getStatus());
             if (mediaPlayer.getStatus() != Status.PLAYING) {
-                if (mediaPlayer.getStatus() == Status.PAUSED) {
-//                    mediaPlayer.seek(startTime);
-                }
                 
                 mediaPlayer.play();
                 
@@ -237,17 +269,60 @@ public class Controller {
     }
     
     public void nextButtonClicked() {
-        if (GUI.getPlaylist().gethMap().size() != 0) {
-            if (GUI.getPlaylist().getPlaylist().next(currentSong) != null) {
-                mediaPlayer.stop();
-                currentSong = GUI.getPlaylist().getPlaylist().next(currentSong);
-                handleCurrentSong(currentSong);
+        boolean isfound = false;
+        Song cursor;
+        Song next = currentSong;
+        
+        if (currentSong != null) {
+            Iterator<Song> iterator = GUI.getPlaylist().gethMap().values().iterator();
+            while (iterator.hasNext()) {
+                cursor = iterator.next();
+                if (currentSong == cursor) {
+                    if (iterator.hasNext()) {
+                        next = iterator.next();
+                        isfound = true;
+                        break;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "This is the Last Song");
+                    }
+                }
+            }
+            if (isfound) {
+                if (isPlaying) {
+                    mediaPlayer.stop();
+                    isPlaying = false;
+                }
+                handleCurrentSong(next);
                 playButtonClicked();
             } else {
                 JOptionPane.showMessageDialog(null, "This is the Last Song");
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "There is no Music file!");
+            
+//        if (currentSong != null) {
+//            ListIterator<Song> iterator = GUI.getPlaylist().gethMap().values().listIterator();
+//            
+//            if (iterator.hasNext()) {
+//                if (isPlaying) {
+//                    mediaPlayer.stop();
+//                    isPlaying = false;
+//                }
+//                handleCurrentSong(iterator.next());
+//                playButtonClicked();
+//            } else {
+//                JOptionPane.showMessageDialog(null, "This is the Last Song");
+//            }
+//        }
+//        if (GUI.getPlaylist().gethMap().size() != 0) {
+//            if (GUI.getPlaylist().getPlaylist().next(currentSong) != null) {
+//                mediaPlayer.stop();
+//                currentSong = GUI.getPlaylist().getPlaylist().next(currentSong);
+//                handleCurrentSong(currentSong);
+//                playButtonClicked();
+//            } else {
+//                JOptionPane.showMessageDialog(null, "This is the Last Song");
+//            }
+//        } else {
+//            JOptionPane.showMessageDialog(null, "There is no Music file!");
         }
     }
     

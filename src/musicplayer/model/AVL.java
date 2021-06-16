@@ -217,12 +217,10 @@ public class AVL {
         }
     }
     public Song previous(Song key) {
-        if (key.equals(find(key, root).data)) {
-            if (find(key, root).left != null) {
-                return find(key, root).left.data;
-            } else {
-                return null;
-            }
+        System.out.println("previous function");
+        if (find(key, root).left != null) {
+            System.out.println(find(key, root).left.data);
+            return find(key, root).left.data;
         } else {
             return null;
         }
