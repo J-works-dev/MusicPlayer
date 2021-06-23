@@ -15,7 +15,7 @@ import musicplayer.controller.Controller;
 public class MusicPlayer{
 
     public static void main(String[] args) throws IOException {
+        // Call Controller, it controll all application
         Controller MusicPlayer = new Controller(args);
-        
     }
 }

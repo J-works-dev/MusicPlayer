@@ -25,11 +25,11 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.swing.JOptionPane;
-//import musicplayer.controller.ButtonController;
 import musicplayer.controller.Controller;
 import musicplayer.model.Playlist;
 import musicplayer.model.Song;
 
+// Main View Class - All design is in this class
 public class View extends Application {
     private Scene scene;
     private VBox mainVBox, leftVBox, rightVBox, playBox;
@@ -39,48 +39,39 @@ public class View extends Application {
     private TextField textSearch, textDelete;
     private static TextField textPlaying;
     private static ListView<String> playingList;
-//    private ButtonController controller;
     private static Controller controller;
     private Label labelAdd, labelSort, labelSearch, labelDelete, labelCSV;
     private static Label totalTime, currentTime;
     private static Playlist playlist;
     
-//    public View(Playlist list) {
-//        this.playlist = list;
-//    }
-    
     @Override
     public void start(Stage stage) throws Exception {
         stage.setTitle("J-works Music Player");
         playlist = new Playlist();
-        initializeComponents();
-        buttonAction();
-
-//        Iterator<String> keys = getPlaylist().gethMap().keySet().iterator();
-//        while(keys.hasNext()){
-//            String key = keys.next();
-//            getPlayingList().getItems().add(key);
-//        }
+        initializeComponents(); // Initialize all components
+        buttonAction(); // All button actions
         
+        // have not used yet
         try {
             FXMLLoader loader = new FXMLLoader(this.getClass().getResource("main.fxml"));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Error: " + ex);
         }
         
-        addComponentsToPane();
+        addComponentsToPane(); // Add components to Pane
         
         scene = new Scene(mainVBox, 400, 500);
         stage.setScene(getScene());
         stage.show();
         
-        stage.setOnCloseRequest(e -> controller.exit());
+        stage.setOnCloseRequest(e -> controller.exit()); // Close application properly
     }
     
     public void display(String[] args) {
         launch(args);
     }
     
+    // Initialize al components
     private void initializeComponents() {
         // Buttons
         firstBtn = new Button();
@@ -101,7 +92,7 @@ public class View extends Application {
         saveCSVBtn = new Button("Save CSV");
         getSaveCSVBtn().setPrefSize(150, 20);
         
-        // Label
+        // Labels
         labelAdd = new Label("Add");
         labelSort = new Label("Sort");
         labelSearch = new Label("Search");
@@ -114,7 +105,7 @@ public class View extends Application {
         nowPlayingSlider = new Slider();
         nowPlayingSlider.setMax(200);
         
-        // TextField
+        // TextFields
         textSearch = new TextField();
         textDelete = new TextField();
         textPlaying = new TextField();
@@ -124,27 +115,30 @@ public class View extends Application {
         // ListView
         playingList = new ListView<>();
 
+        // Icons for buttons
         addIcon(getFirstBtn(), "icons/first.png");
         addIcon(getBackBtn(), "icons/back.png");
         addIcon(getPlayBtn(), "icons/play.png");
         addIcon(getNextBtn(), "icons/next.png");
         addIcon(getLastBtn(), "icons/last.png");
-        
-        
     }
     
+    // Add components to Pane
     private void addComponentsToPane() {
+        // Set Labels
         labelAdd.setPadding(new Insets(10, 0, 0, 0));
         labelSort.setPadding(new Insets(10, 0, 0, 0));
         labelSearch.setPadding(new Insets(10, 0, 0, 0));
         labelDelete.setPadding(new Insets(10, 0, 0, 0));
         labelCSV.setPadding(new Insets(10, 0, 0, 0));
         
+        // Funtionality Section
         leftVBox = new VBox();
         leftVBox.setPadding(new Insets(10, 10, 10, 10));
         leftVBox.setSpacing(10);
         leftVBox.getChildren().addAll(labelAdd, getAddBtn(), labelSearch, textSearch, getSearchBtn(), labelDelete, textDelete, getDeleteBtn(), labelCSV, getLoadCSVBtn(), getSaveCSVBtn()); // labelSort, sortBtn, 
         
+        // Display Playlist
         rightVBox = new VBox();
         rightVBox.setPadding(new Insets(10, 10, 10, 10));
         rightVBox.setSpacing(10);
@@ -153,28 +147,33 @@ public class View extends Application {
         mainHBox = new HBox();
         mainHBox.getChildren().addAll(leftVBox, rightVBox);
         
+        // Seek Slider and Time
         seekBar = new HBox();
         seekBar.setMargin(nowPlayingSlider, new Insets(0, 3, 0, 3));
         seekBar.getChildren().addAll(currentTime, nowPlayingSlider, totalTime);
         
+        // Slider and Text for playing song name
         playBox = new VBox();
         playBox.setMargin(textPlaying, new Insets(5, 0, 0, 0));
         playBox.getChildren().addAll(seekBar, textPlaying);
         
+        // Music Player
         mPlayer = new HBox();
         mPlayer.setPadding(new Insets(10, 10, 10, 10));
         mPlayer.setMargin(playBox, new Insets(0, 0, 0, 15));
         mPlayer.setSpacing(10);
         mPlayer.getChildren().addAll(getBackBtn(), getPlayBtn(), getNextBtn(), playBox);
-//        mPlayer.getChildren().addAll(getFirstBtn(), getBackBtn(), getPlayBtn(), getNextBtn(), getLastBtn(), playBox);
         
         mainVBox = new VBox();
         mainVBox.getChildren().addAll(mainHBox, mPlayer);
     }
     
+    // All Button Actions
     private void buttonAction() {
+        // When Button action occured, call main function in Controller
         controller = new Controller();
         
+        // Add Song
         getAddBtn().setOnAction(e -> {
             try {
                 Song song = controller.addButtonClicked();
@@ -188,8 +187,10 @@ public class View extends Application {
             }
         });
         
+        // not using
         getSortBtn().setOnAction(e -> controller.sortButtonClicked());
         
+        // Search a Song
         getSearchBtn().setOnAction(e -> {
             String key = textSearch.getText();
             if (key != null) {
@@ -197,12 +198,14 @@ public class View extends Application {
             }
         });
         
+        // Delete a Song
         getDeleteBtn().setOnAction(e -> {
             String key = textDelete.getText();
             System.out.println(key);
             controller.deleteButtonClicked(key);
         });
         
+        // Player buttons
         getFirstBtn().setOnAction(e -> controller.firstButtonClicked());
         
         getBackBtn().setOnAction(e -> controller.backButtonClicked());
@@ -213,10 +216,12 @@ public class View extends Application {
         
         getLastBtn().setOnAction(e -> controller.lastButtonClicked());
         
+        // CSV buttons
         getLoadCSVBtn().setOnAction(e -> controller.loadCSVButtonClicked());
         
         getSaveCSVBtn().setOnAction(e -> controller.saveCSVButtonClicked());
         
+        // Playlist click option
         getPlayingList().setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) {
                 controller.listViewDoubleClicked();
@@ -227,6 +232,7 @@ public class View extends Application {
         });
     }
     
+    // Add Icon to Button
     public void addIcon(Button button, String iconPath) {
         try {
             Image icon = new Image(getClass().getResource(iconPath).toExternalForm());
@@ -239,15 +245,13 @@ public class View extends Application {
         }
     }
     
-    public Scene getScene() {
-        return scene;
-    }
-    
+    // Add a item to list
     public void addPlaylist(String key) {
         getPlayingList().getItems().add(key);
         
     }
     
+    // Display Playlist
     public void displayPlaylist() {
         Song[] songs = playlist.getPlaylist().display();
         if (songs != null) {
@@ -257,7 +261,12 @@ public class View extends Application {
             }
         }
     }
-
+    
+    // Getter and Setter
+    public Scene getScene() {
+        return scene;
+    }
+    
     public ListView<String> getPlayingList() {
         return playingList;
     }

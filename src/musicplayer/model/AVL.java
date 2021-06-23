@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 
+// AVL Tree for Playlist
 public class AVL {
+    // Sub class Node
     public class Node {
         public Song data;
         public Node left, right;
@@ -104,7 +106,7 @@ public class AVL {
         parent.right = rotateLL(pivot);
         return rotateRR(parent);
     }
-    
+    // return all songs
     public Song[] display() {
         songs = new ArrayList<>();
         if (root == null) {
@@ -117,6 +119,7 @@ public class AVL {
         }
         return array;
     }
+    // not using
     private void displayTree(Node current) {
         if (current != null) {
             displayTree(current.left);
@@ -124,7 +127,7 @@ public class AVL {
             displayTree(current.right);
         }
     }
-    
+    // Delete a Song
     public void delete(Song target) {
         root = remove(root, target);
     }
@@ -176,10 +179,9 @@ public class AVL {
         }
         return current;
     }
-    
+    // Search a Song
     public boolean search(Song key) {
         if (key.equals(find(key, root).data)) {
-//            JOptionPane.showMessageDialog(null, key + "was found.");
             return true;
         } else {
             JOptionPane.showMessageDialog(null, "Nothing found!");
@@ -205,6 +207,7 @@ public class AVL {
             return find(key, current.right);
         }
     }
+    // return Next Song
     public Song next(Song key) {
         if (key.equals(find(key, root).data)) {
             if (find(key, root).right != null) {
@@ -216,6 +219,7 @@ public class AVL {
             return null;
         }
     }
+    // return Previous Song
     public Song previous(Song key) {
         System.out.println("previous function");
         if (find(key, root).left != null) {
