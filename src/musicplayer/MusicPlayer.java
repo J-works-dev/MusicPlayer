@@ -6,10 +6,7 @@
  */
 package musicplayer;
 
-//import javafx.application.Application;
-//import javafx.stage.Stage;
 import java.io.IOException;
-//import musicplayer.view.View;
 import musicplayer.controller.Controller;
 
 public class MusicPlayer{
